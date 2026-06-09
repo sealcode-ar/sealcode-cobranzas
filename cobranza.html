@@ -901,6 +901,14 @@ function guardarAcuerdo(){
     payload.cantidadCuotas = val('f-ncuotas');
     payload.montoCuota = val('f-monto-cuota');
     payload.primerVencimiento = val('f-fecha-cuota');
+    var fechas = [];
+    var base = new Date(val('f-fecha-cuota'));
+    var n = parseInt(val('f-ncuotas'));
+    for(var i = 0; i < n; i++){
+      var f = new Date(base.getFullYear(), base.getMonth() + i, base.getDate());
+      fechas.push(f.getFullYear() + '-' + String(f.getMonth()+1).padStart(2,'0') + '-' + String(f.getDate()).padStart(2,'0'));
+    }
+    payload.fechas = fechas;
   } else if(tipoActual==='unico'){
     payload.fechaVencimiento = val('f-fecha-unico');
     payload.formaPago = val('f-forma-unico');
