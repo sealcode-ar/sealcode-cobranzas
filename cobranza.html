@@ -560,24 +560,7 @@ var STATE = {
 // ════════════════════════════════════════════════════════════════
 // MOCK DATA — se reemplaza por GET al Sheets cuando haya webhook
 // ════════════════════════════════════════════════════════════════
-var MOCK_ACUERDOS = [
-  {id:'AC001',cliente:'Arcor S.A.',concepto:'Canon comodato',tipo:'Recurrente',monto:'135000',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC001-1',n:1,fecha:'10/04/2026',monto:'$45.000',estado:'done'},{id:'VNC-AC001-2',n:2,fecha:'10/05/2026',monto:'$45.000',estado:'done'},{id:'VNC-AC001-3',n:3,fecha:'10/06/2026',monto:'$45.000',estado:'due'}]},
-  {id:'AC002',cliente:'Bimbo Argentina',concepto:'Reparación TIJ',tipo:'Cuotas',monto:'96000',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC002-1',n:1,fecha:'10/04/2026',monto:'$32.000',estado:'done'},{id:'VNC-AC002-2',n:2,fecha:'08/06/2026',monto:'$32.000',estado:'late'},{id:'VNC-AC002-3',n:3,fecha:'08/07/2026',monto:'$32.000',estado:'future'}]},
-  {id:'AC003',cliente:'Molinos Río',concepto:'Preventivo junio',tipo:'Pago único',monto:'18500',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC003-1',n:1,fecha:'12/06/2026',monto:'$18.500',estado:'due'}]},
-  {id:'AC004',cliente:'La Serenísima',concepto:'Canon comodato HD',tipo:'Cuotas',monto:'110000',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC004-1',n:1,fecha:'14/06/2026',monto:'$55.000',estado:'due'},{id:'VNC-AC004-2',n:2,fecha:'14/07/2026',monto:'$55.000',estado:'future'}]},
-  {id:'AC005',cliente:'Danone Argentina',concepto:'Insumos DOD',tipo:'Recurrente',monto:'28000',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC005-1',n:1,fecha:'15/06/2026',monto:'$28.000',estado:'due'}]},
-  {id:'AC006',cliente:'Pepsico Argentina',concepto:'Insumos laser',tipo:'Pago único',monto:'21000',moneda:'ARS',estado:'Vencido',
-   cuotas:[{id:'VNC-AC006-1',n:1,fecha:'28/05/2026',monto:'$21.000',estado:'late'}]},
-  {id:'AC007',cliente:'Unilever',concepto:'Canon comodato',tipo:'Cuotas',monto:'56000',moneda:'ARS',estado:'Activo',
-   cuotas:[{id:'VNC-AC007-1',n:1,fecha:'15/03/2026',monto:'$14.000',estado:'done'},{id:'VNC-AC007-2',n:2,fecha:'15/05/2026',monto:'$14.000',estado:'late'},{id:'VNC-AC007-3',n:3,fecha:'15/06/2026',monto:'$14.000',estado:'future'},{id:'VNC-AC007-4',n:4,fecha:'15/07/2026',monto:'$14.000',estado:'future'}]},
-  {id:'AC008',cliente:'Kraft Heinz',concepto:'Mantenimiento anual',tipo:'Recurrente',monto:'1200',moneda:'USD',estado:'Activo',
-   cuotas:[{id:'VNC-AC008-1',n:1,fecha:'01/01/2026',monto:'$100 USD',estado:'done'},{id:'VNC-AC008-2',n:2,fecha:'01/02/2026',monto:'$100 USD',estado:'done'},{id:'VNC-AC008-3',n:3,fecha:'01/06/2026',monto:'$100 USD',estado:'due'}]}
-];
+var MOCK_ACUERDOS = [];
 
 // ════════════════════════════════════════════════════════════════
 // INICIALIZACIÓN
