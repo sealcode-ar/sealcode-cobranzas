@@ -198,6 +198,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
   .tipo-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css"/>
+<style>
+.flatpickr-calendar{background:#1a1f2e;border:1px solid #2d3748;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+.flatpickr-day{color:#94a3b8;}
+.flatpickr-day:hover,.flatpickr-day.selected{background:#FF6B00;border-color:#FF6B00;color:#fff;}
+.flatpickr-day.today{border-color:#FF6B00;color:#FF6B00;}
+.flatpickr-months,.flatpickr-weekdays{background:#0D1117;}
+.flatpickr-month{color:#f1f5f9;}
+.flatpickr-current-month,.flatpickr-monthDropdown-months{color:#f1f5f9;}
+.flatpickr-weekday{color:#475569;}
+.flatpickr-prev-month svg,.flatpickr-next-month svg{fill:#94a3b8;}
+.numInputWrapper span{border-color:#2d3748;}
+.numInput{color:#f1f5f9;background:#1a1f2e;}
+.flatpickr-day.flatpickr-disabled{color:#2d3748;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/es.js"></script>
 </head>
 <body>
 
@@ -334,7 +351,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
             <div class="field"><label>Cliente *</label><input id="f-cliente" type="text" placeholder="Nombre o razón social" autocomplete="off"/></div>
             <div class="field"><label>Concepto *</label><input id="f-concepto" type="text" placeholder="Ej: Canon comodato junio" autocomplete="off"/></div>
           </div>
-          <div class="form-grid-3">
+          <div class="form-grid-2" id="f-monto-wrap">
             <div class="field"><label>Monto total *</label><input id="f-monto" type="number" placeholder="0.00" min="0" step="0.01"/></div>
             <div class="field"><label>Moneda</label>
               <select id="f-moneda">
@@ -342,10 +359,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
                 <option value="USD">USD — Dólares</option>
               </select>
             </div>
-            <div class="field" id="f-dia-wrap">
-              <label>Día de cobro habitual</label>
-              <input id="f-dia" type="number" placeholder="Ej: 10" min="1" max="31"/>
-              <div class="field-note">Día del mes en que vence</div>
+          </div>
+          <div class="form-grid-1" id="f-moneda-solo-wrap" style="display:none;">
+            <div class="field"><label>Moneda</label>
+              <select id="f-moneda-solo">
+                <option value="ARS">ARS — Pesos</option>
+                <option value="USD">USD — Dólares</option>
+              </select>
             </div>
           </div>
           <div class="form-grid-2">
@@ -514,9 +534,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
 // ════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN — reemplazar con URL real del webhook Make
 // ════════════════════════════════════════════════════════════════
-var WEBHOOK_NUEVO_ACUERDO  = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
-var WEBHOOK_MARCAR_COBRADO = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
-var WEBHOOK_CANCELAR       = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
+var WEBHOOK_NUEVO_ACUERDO = "WEBHOOK_URL_AQUI";
+var WEBHOOK_MARCAR_COBRADO = "WEBHOOK_URL_AQUI";
+var WEBHOOK_CANCELAR = "WEBHOOK_URL_AQUI";
 
 // ════════════════════════════════════════════════════════════════
 // ESTADO GLOBAL
@@ -556,6 +576,17 @@ var MOCK_ACUERDOS = [
 // ════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function(){
   STATE.acuerdos = MOCK_ACUERDOS;
+  // Inicializar date pickers
+  var dateConfig = {
+    locale: 'es',
+    dateFormat: 'Y-m-d',
+    disableMobile: false,
+    theme: 'dark'
+  };
+  ['f-fecha-rec','f-fecha-cuota','f-fecha-unico','f-fecha-momento','mc-fecha'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) flatpickr(el, Object.assign({}, dateConfig));
+  });
   renderDashboard();
   renderAcuerdos();
   renderCobrar();
@@ -839,17 +870,28 @@ function actualizarFormulario(){
     var s = document.getElementById('sec-'+t);
     if(s) s.style.display = t===tipoActual ? 'block' : 'none';
   });
-  var diaWrap = document.getElementById('f-dia-wrap');
-  if(diaWrap) diaWrap.style.display = tipoActual==='recurrente' ? 'block' : 'none';
+  // Recurrente: ocultar monto total, mostrar solo moneda
+  var montoWrap = document.getElementById('f-monto-wrap');
+  var monedaSoloWrap = document.getElementById('f-moneda-solo-wrap');
+  if(tipoActual === 'recurrente'){
+    if(montoWrap) montoWrap.style.display = 'none';
+    if(monedaSoloWrap) monedaSoloWrap.style.display = 'block';
+  } else {
+    if(montoWrap) montoWrap.style.display = 'grid';
+    if(monedaSoloWrap) monedaSoloWrap.style.display = 'none';
+  }
   setTodayDates();
 }
 
 function camposRequeridos(){
   var base = [
     {id:'f-cliente',label:'Cliente'},
-    {id:'f-concepto',label:'Concepto'},
-    {id:'f-monto',label:'Monto total'}
+    {id:'f-concepto',label:'Concepto'}
   ];
+  // Monto total solo requerido si no es recurrente
+  if(tipoActual !== 'recurrente'){
+    base.push({id:'f-monto',label:'Monto total'});
+  }
   var extra = {
     recurrente:[{id:'f-monto-mensual',label:'Monto mensual'},{id:'f-fecha-rec',label:'Primer vencimiento'}],
     cuotas:[{id:'f-ncuotas',label:'Cantidad de cuotas'},{id:'f-monto-cuota',label:'Monto por cuota'},{id:'f-fecha-cuota',label:'Primer vencimiento'}],
@@ -881,12 +923,11 @@ function guardarAcuerdo(){
 
   // construir payload
   var payload = {
-    accion: 'nuevo_acuerdo',
     tipo: tipoActual,
     cliente: val('f-cliente'),
     concepto: val('f-concepto'),
     monto: val('f-monto'),
-    moneda: val('f-moneda'),
+    moneda: tipoActual === 'recurrente' ? val('f-moneda-solo') : val('f-moneda'),
     mail: val('f-mail'),
     notas: val('f-notas'),
     origen: 'cobranza.html',
@@ -901,15 +942,6 @@ function guardarAcuerdo(){
     payload.cantidadCuotas = val('f-ncuotas');
     payload.montoCuota = val('f-monto-cuota');
     payload.primerVencimiento = val('f-fecha-cuota');
-    var fechas = [];
-    var partes = val('f-fecha-cuota').split('-');
-var base = new Date(parseInt(partes[0]), parseInt(partes[1])-1, parseInt(partes[2]));
-    var n = parseInt(val('f-ncuotas'));
-    for(var i = 0; i < n; i++){
-      var f = new Date(base.getFullYear(), base.getMonth() + i, base.getDate());
-      fechas.push(f.getFullYear() + '-' + String(f.getMonth()+1).padStart(2,'0') + '-' + String(f.getDate()).padStart(2,'0'));
-    }
-    payload.fechas = fechas;
   } else if(tipoActual==='unico'){
     payload.fechaVencimiento = val('f-fecha-unico');
     payload.formaPago = val('f-forma-unico');
