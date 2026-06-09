@@ -534,21 +534,21 @@ var STATE = {
 // ════════════════════════════════════════════════════════════════
 var MOCK_ACUERDOS = [
   {id:'AC001',cliente:'Arcor S.A.',concepto:'Canon comodato',tipo:'Recurrente',monto:'135000',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'10/04/2026',monto:'$45.000',estado:'done'},{n:2,fecha:'10/05/2026',monto:'$45.000',estado:'done'},{n:3,fecha:'10/06/2026',monto:'$45.000',estado:'due'}]},
+   cuotas:[{id:'VNC-AC001-1',n:1,fecha:'10/04/2026',monto:'$45.000',estado:'done'},{id:'VNC-AC001-2',n:2,fecha:'10/05/2026',monto:'$45.000',estado:'done'},{id:'VNC-AC001-3',n:3,fecha:'10/06/2026',monto:'$45.000',estado:'due'}]},
   {id:'AC002',cliente:'Bimbo Argentina',concepto:'Reparación TIJ',tipo:'Cuotas',monto:'96000',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'10/04/2026',monto:'$32.000',estado:'done'},{n:2,fecha:'08/06/2026',monto:'$32.000',estado:'late'},{n:3,fecha:'08/07/2026',monto:'$32.000',estado:'future'}]},
+   cuotas:[{id:'VNC-AC002-1',n:1,fecha:'10/04/2026',monto:'$32.000',estado:'done'},{id:'VNC-AC002-2',n:2,fecha:'08/06/2026',monto:'$32.000',estado:'late'},{id:'VNC-AC002-3',n:3,fecha:'08/07/2026',monto:'$32.000',estado:'future'}]},
   {id:'AC003',cliente:'Molinos Río',concepto:'Preventivo junio',tipo:'Pago único',monto:'18500',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'12/06/2026',monto:'$18.500',estado:'due'}]},
+   cuotas:[{id:'VNC-AC003-1',n:1,fecha:'12/06/2026',monto:'$18.500',estado:'due'}]},
   {id:'AC004',cliente:'La Serenísima',concepto:'Canon comodato HD',tipo:'Cuotas',monto:'110000',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'14/06/2026',monto:'$55.000',estado:'due'},{n:2,fecha:'14/07/2026',monto:'$55.000',estado:'future'}]},
+   cuotas:[{id:'VNC-AC004-1',n:1,fecha:'14/06/2026',monto:'$55.000',estado:'due'},{id:'VNC-AC004-2',n:2,fecha:'14/07/2026',monto:'$55.000',estado:'future'}]},
   {id:'AC005',cliente:'Danone Argentina',concepto:'Insumos DOD',tipo:'Recurrente',monto:'28000',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'15/06/2026',monto:'$28.000',estado:'due'}]},
+   cuotas:[{id:'VNC-AC005-1',n:1,fecha:'15/06/2026',monto:'$28.000',estado:'due'}]},
   {id:'AC006',cliente:'Pepsico Argentina',concepto:'Insumos laser',tipo:'Pago único',monto:'21000',moneda:'ARS',estado:'Vencido',
-   cuotas:[{n:1,fecha:'28/05/2026',monto:'$21.000',estado:'late'}]},
+   cuotas:[{id:'VNC-AC006-1',n:1,fecha:'28/05/2026',monto:'$21.000',estado:'late'}]},
   {id:'AC007',cliente:'Unilever',concepto:'Canon comodato',tipo:'Cuotas',monto:'56000',moneda:'ARS',estado:'Activo',
-   cuotas:[{n:1,fecha:'15/03/2026',monto:'$14.000',estado:'done'},{n:2,fecha:'15/05/2026',monto:'$14.000',estado:'late'},{n:3,fecha:'15/06/2026',monto:'$14.000',estado:'future'},{n:4,fecha:'15/07/2026',monto:'$14.000',estado:'future'}]},
+   cuotas:[{id:'VNC-AC007-1',n:1,fecha:'15/03/2026',monto:'$14.000',estado:'done'},{id:'VNC-AC007-2',n:2,fecha:'15/05/2026',monto:'$14.000',estado:'late'},{id:'VNC-AC007-3',n:3,fecha:'15/06/2026',monto:'$14.000',estado:'future'},{id:'VNC-AC007-4',n:4,fecha:'15/07/2026',monto:'$14.000',estado:'future'}]},
   {id:'AC008',cliente:'Kraft Heinz',concepto:'Mantenimiento anual',tipo:'Recurrente',monto:'1200',moneda:'USD',estado:'Activo',
-   cuotas:[{n:1,fecha:'01/01/2026',monto:'$100 USD',estado:'done'},{n:2,fecha:'01/02/2026',monto:'$100 USD',estado:'done'},{n:3,fecha:'01/06/2026',monto:'$100 USD',estado:'due'}]}
+   cuotas:[{id:'VNC-AC008-1',n:1,fecha:'01/01/2026',monto:'$100 USD',estado:'done'},{id:'VNC-AC008-2',n:2,fecha:'01/02/2026',monto:'$100 USD',estado:'done'},{id:'VNC-AC008-3',n:3,fecha:'01/06/2026',monto:'$100 USD',estado:'due'}]}
 ];
 
 // ════════════════════════════════════════════════════════════════
@@ -590,13 +590,13 @@ function renderDashboard(){
       var monto = parseFloat(a.monto / a.cuotas.length);
       if(c.estado === 'late'){
         vencidos++;
-        vencList.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,dias:Math.floor((hoy-fDate)/(1000*60*60*24)),id:a.id,cuotaN:c.n});
+        vencList.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,dias:Math.floor((hoy-fDate)/(1000*60*60*24)),id:a.id,cuotaN:c.n,id_vencimiento:c.id,id_acuerdo:a.id,tipo_acuerdo:a.tipo});
         if(a.moneda==='ARS') pendARS += monto;
         else pendUSD += monto;
       }
       if(c.estado === 'due'){
         if(fDate >= hoy && fDate <= en7) semana++;
-        proximos.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,estado:c.estado,id:a.id,cuotaN:c.n});
+        proximos.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,estado:c.estado,id:a.id,cuotaN:c.n,id_vencimiento:c.id,id_acuerdo:a.id,tipo_acuerdo:a.tipo});
         if(a.moneda==='ARS') pendARS += monto;
         else pendUSD += monto;
       }
@@ -623,7 +623,7 @@ function renderDashboard(){
         +'<td class="name">'+r.cliente+'</td><td>'+r.concepto+'</td><td>'+r.fecha+'</td>'
         +'<td>'+r.monto+'</td><td>'+r.moneda+'</td>'
         +'<td><span class="badge pend">Pendiente</span></td>'
-        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button></td>'
+        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\',\''+r.id_vencimiento+'\',\''+r.id_acuerdo+'\',\''+r.tipo_acuerdo+'\')">Cobrar</button></td>'
         +'</tr>';
     }).join('');
   }
@@ -638,7 +638,7 @@ function renderDashboard(){
         +'<td class="name">'+r.cliente+'</td><td>'+r.concepto+'</td><td>'+r.fecha+'</td>'
         +'<td>'+r.monto+'</td><td>'+r.moneda+'</td>'
         +'<td style="color:var(--red);font-weight:700;">'+r.dias+'</td>'
-        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button></td>'
+        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\',\''+r.id_vencimiento+'\',\''+r.id_acuerdo+'\',\''+r.tipo_acuerdo+'\')">Cobrar</button></td>'
         +'</tr>';
     }).join('');
   }
@@ -704,7 +704,8 @@ function renderCobrar(){
       items.push({
         cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,
         fecha:c.fecha,monto:c.monto,moneda:a.moneda,
-        late:c.estado==='late',dias:dias,id:a.id
+        late:c.estado==='late',dias:dias,
+        id_vencimiento:c.id,id_acuerdo:a.id,tipo_acuerdo:a.tipo
       });
     });
   });
@@ -740,7 +741,7 @@ function renderCobrar(){
       +'<div class="venc-dot" style="background:'+dotColor+';"></div>'
       +'<div class="venc-info"><div class="venc-cliente">'+r.cliente+'</div><div class="venc-concepto">'+r.concepto+'</div></div>'
       +'<div class="venc-right"><div class="venc-date" style="'+dateColor+'">'+fechaTxt+'</div><div class="venc-amount">'+r.monto+' '+r.moneda+'</div></div>'
-      +'<button class="'+btnClass+' btn-sm" style="margin-left:10px;white-space:nowrap;" onclick="openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button>'
+      +'<button class="'+btnClass+' btn-sm" style="margin-left:10px;white-space:nowrap;" onclick="openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\',\''+r.id_vencimiento+'\',\''+r.id_acuerdo+'\',\''+r.tipo_acuerdo+'\')">Cobrar</button>'
       +'</div>';
   }).join('');
 }
@@ -780,7 +781,7 @@ function openDetail(id){
   if(proxCuota){
     btnCobrar.disabled = false;
     btnCobrar.onclick = function(){
-      openModalCobrar(a.cliente, a.concepto+' C'+proxCuota.n+'/'+a.cuotas.length, proxCuota.monto+' '+a.moneda);
+      openModalCobrar(a.cliente, a.concepto+' C'+proxCuota.n+'/'+a.cuotas.length, proxCuota.monto+' '+a.moneda, proxCuota.id, a.id, a.tipo);
     };
   } else {
     btnCobrar.disabled = true;
@@ -950,8 +951,15 @@ function resetForm(){
 // ════════════════════════════════════════════════════════════════
 // MODAL COBRAR
 // ════════════════════════════════════════════════════════════════
-function openModalCobrar(cliente, concepto, monto){
-  STATE.cobraData = {cliente:cliente,concepto:concepto,monto:monto};
+function openModalCobrar(cliente, concepto, monto, id_vencimiento, id_acuerdo, tipo_acuerdo){
+  STATE.cobraData = {
+    cliente: cliente,
+    concepto: concepto,
+    monto: monto,
+    id_vencimiento: id_vencimiento || '',
+    id_acuerdo: id_acuerdo || '',
+    tipo_acuerdo: tipo_acuerdo || ''
+  };
   setText('mc-concepto', cliente+' — '+concepto);
   setText('mc-monto', monto);
   var today = new Date().toISOString().split('T')[0];
@@ -965,6 +973,9 @@ function confirmarCobro(){
 
   var payload = {
     accion: 'marcar_cobrado',
+    id_vencimiento: STATE.cobraData ? STATE.cobraData.id_vencimiento : '',
+    id_acuerdo: STATE.cobraData ? STATE.cobraData.id_acuerdo : '',
+    tipo_acuerdo: STATE.cobraData ? STATE.cobraData.tipo_acuerdo : '',
     cliente: STATE.cobraData ? STATE.cobraData.cliente : '',
     concepto: STATE.cobraData ? STATE.cobraData.concepto : '',
     monto: STATE.cobraData ? STATE.cobraData.monto : '',
