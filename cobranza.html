@@ -197,32 +197,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
   .form-grid-3{grid-template-columns:1fr 1fr;}
   .tipo-grid{grid-template-columns:1fr 1fr;}
 }
-<style>
-.flatpickr-calendar{background:#1a1f2e !important;border:1px solid #FF6B00 !important;box-shadow:0 8px 32px rgba(0,0,0,0.6) !important;border-radius:8px;}
-.flatpickr-day{color:#94a3b8 !important;border-radius:5px;}
-.flatpickr-day:hover{background:#FF6B00 !important;border-color:#FF6B00 !important;color:#fff !important;}
-.flatpickr-day.selected{background:#FF6B00 !important;border-color:#FF6B00 !important;color:#fff !important;}
-.flatpickr-day.today{border-color:#FF6B00 !important;color:#FF6B00 !important;}
-.flatpickr-day.flatpickr-disabled{color:#2d3748 !important;}
-.flatpickr-months{background:#0D1117 !important;border-radius:8px 8px 0 0;}
-.flatpickr-month{color:#f1f5f9 !important;fill:#f1f5f9 !important;}
-.flatpickr-weekdays{background:#0D1117 !important;}
-.flatpickr-weekday{color:#FF6B00 !important;font-weight:700;}
-.flatpickr-current-month{color:#f1f5f9 !important;}
-.flatpickr-current-month input.cur-year{color:#f1f5f9 !important;}
-.flatpickr-current-month input.cur-year:focus{outline:none;}
+
+/* ── FLATPICKR DARK THEME ────────────────────────────────────── */
+.flatpickr-calendar{background:#1a1f2e!important;border:1px solid #FF6B00!important;box-shadow:0 8px 32px rgba(0,0,0,0.6)!important;border-radius:8px;}
+.flatpickr-day{color:#94a3b8!important;border-radius:5px;}
+.flatpickr-day:hover,.flatpickr-day.selected{background:#FF6B00!important;border-color:#FF6B00!important;color:#fff!important;}
+.flatpickr-day.today{border-color:#FF6B00!important;color:#FF6B00!important;}
+.flatpickr-day.flatpickr-disabled{color:#2d3748!important;}
+.flatpickr-months,.flatpickr-weekdays{background:#0D1117!important;}
+.flatpickr-month{color:#f1f5f9!important;fill:#f1f5f9!important;}
+.flatpickr-weekday{color:#FF6B00!important;font-weight:700;}
+.flatpickr-current-month{color:#f1f5f9!important;}
+.flatpickr-current-month input.cur-year{color:#f1f5f9!important;background:transparent;}
 .numInputWrapper:hover{background:transparent;}
-.numInputWrapper span{border-color:#2d3748 !important;}
-.numInputWrapper span svg{fill:#94a3b8 !important;}
-.numInput{color:#f1f5f9 !important;background:transparent !important;}
-.flatpickr-monthDropdown-months{background:#0D1117 !important;color:#f1f5f9 !important;border:none !important;}
-.flatpickr-monthDropdown-months option{background:#1a1f2e !important;color:#f1f5f9 !important;}
-.flatpickr-prev-month,.flatpickr-next-month{fill:#94a3b8 !important;}
-.flatpickr-prev-month:hover svg,.flatpickr-next-month:hover svg{fill:#FF6B00 !important;}
-.flatpickr-prev-month svg,.flatpickr-next-month svg{fill:#94a3b8 !important;}
-.flatpickr-innerContainer,.flatpickr-rContainer{background:#1a1f2e !important;}
-.dayContainer{background:#1a1f2e !important;}
+.numInputWrapper span{border-color:#2d3748!important;}
+.numInputWrapper span svg{fill:#94a3b8!important;}
+.numInput{color:#f1f5f9!important;background:transparent!important;}
+.flatpickr-monthDropdown-months{background:#0D1117!important;color:#f1f5f9!important;border:none!important;}
+.flatpickr-monthDropdown-months option{background:#1a1f2e!important;color:#f1f5f9!important;}
+.flatpickr-prev-month svg,.flatpickr-next-month svg{fill:#94a3b8!important;}
+.flatpickr-prev-month:hover svg,.flatpickr-next-month:hover svg{fill:#FF6B00!important;}
+.flatpickr-innerContainer,.flatpickr-rContainer,.dayContainer{background:#1a1f2e!important;}
+
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/es.js"></script>
 </head>
@@ -544,9 +542,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,H
 // ════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN — reemplazar con URL real del webhook Make
 // ════════════════════════════════════════════════════════════════
-var WEBHOOK_NUEVO_ACUERDO = "WEBHOOK_URL_AQUI";
-var WEBHOOK_MARCAR_COBRADO = "WEBHOOK_URL_AQUI";
-var WEBHOOK_CANCELAR = "WEBHOOK_URL_AQUI";
+var WEBHOOK_NUEVO_ACUERDO  = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
+var WEBHOOK_MARCAR_COBRADO = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
+var WEBHOOK_CANCELAR       = "https://hook.us2.make.com/hhymilfcxyktrofk4dhrael68oiad868";
 
 // ════════════════════════════════════════════════════════════════
 // ESTADO GLOBAL
@@ -586,16 +584,11 @@ var MOCK_ACUERDOS = [
 // ════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function(){
   STATE.acuerdos = MOCK_ACUERDOS;
-  // Inicializar date pickers
-  var dateConfig = {
-    locale: 'es',
-    dateFormat: 'Y-m-d',
-    disableMobile: false,
-    theme: 'dark'
-  };
+  // Date pickers
+  var fpConfig = {locale:'es', dateFormat:'Y-m-d', disableMobile:false};
   ['f-fecha-rec','f-fecha-cuota','f-fecha-unico','f-fecha-momento','mc-fecha'].forEach(function(id){
     var el = document.getElementById(id);
-    if(el) flatpickr(el, Object.assign({}, dateConfig));
+    if(el) flatpickr(el, Object.assign({}, fpConfig));
   });
   renderDashboard();
   renderAcuerdos();
@@ -880,7 +873,6 @@ function actualizarFormulario(){
     var s = document.getElementById('sec-'+t);
     if(s) s.style.display = t===tipoActual ? 'block' : 'none';
   });
-  // Recurrente: ocultar monto total, mostrar solo moneda
   var montoWrap = document.getElementById('f-monto-wrap');
   var monedaSoloWrap = document.getElementById('f-moneda-solo-wrap');
   if(tipoActual === 'recurrente'){
@@ -898,7 +890,6 @@ function camposRequeridos(){
     {id:'f-cliente',label:'Cliente'},
     {id:'f-concepto',label:'Concepto'}
   ];
-  // Monto total solo requerido si no es recurrente
   if(tipoActual !== 'recurrente'){
     base.push({id:'f-monto',label:'Monto total'});
   }
@@ -933,6 +924,7 @@ function guardarAcuerdo(){
 
   // construir payload
   var payload = {
+    accion: 'nuevo_acuerdo',
     tipo: tipoActual,
     cliente: val('f-cliente'),
     concepto: val('f-concepto'),
@@ -952,6 +944,15 @@ function guardarAcuerdo(){
     payload.cantidadCuotas = val('f-ncuotas');
     payload.montoCuota = val('f-monto-cuota');
     payload.primerVencimiento = val('f-fecha-cuota');
+    var fechas = [];
+    var partes = val('f-fecha-cuota').split('-');
+    var base = new Date(parseInt(partes[0]), parseInt(partes[1])-1, parseInt(partes[2]));
+    var n = parseInt(val('f-ncuotas'));
+    for(var i = 0; i < n; i++){
+      var f = new Date(base.getFullYear(), base.getMonth() + i, base.getDate());
+      fechas.push(f.getFullYear() + '-' + String(f.getMonth()+1).padStart(2,'0') + '-' + String(f.getDate()).padStart(2,'0'));
+    }
+    payload.fechas = fechas;
   } else if(tipoActual==='unico'){
     payload.fechaVencimiento = val('f-fecha-unico');
     payload.formaPago = val('f-forma-unico');
