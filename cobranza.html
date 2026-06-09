@@ -881,6 +881,7 @@ function guardarAcuerdo(){
 
   // construir payload
   var payload = {
+    accion: 'nuevo_acuerdo',
     tipo: tipoActual,
     cliente: val('f-cliente'),
     concepto: val('f-concepto'),
