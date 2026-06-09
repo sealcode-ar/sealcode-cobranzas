@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cobranzas — Sealcode Argentina</title>
+<style>
+/* ── RESET & BASE ───────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0D1117;
+  --bg2:#111827;
+  --bg3:#1a1f2e;
+  --bg4:#1e2535;
+  --border:#1f2937;
+  --border2:#2d3748;
+  --orange:#FF6B00;
+  --orange-dim:#cc5500;
+  --orange-bg:rgba(255,107,0,0.09);
+  --text:#f1f5f9;
+  --text2:#94a3b8;
+  --text3:#475569;
+  --green:#4ade80;
+  --green-bg:rgba(74,222,128,0.1);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,0.1);
+  --yellow:#fbbf24;
+  --yellow-bg:rgba(251,191,36,0.1);
+  --blue:#60a5fa;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;font-size:14px;}
+
+/* ── LAYOUT ─────────────────────────────────────────────────── */
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:200px;background:#090d14;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.topbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0;}
+.content{flex:1;overflow-y:auto;padding:18px 22px;}
+.content.locked{overflow:hidden;}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+.sb-logo{padding:16px 14px 14px;border-bottom:1px solid var(--border);}
+.sb-logo-name{color:var(--orange);font-size:13px;font-weight:700;letter-spacing:1.5px;}
+.sb-logo-sub{color:var(--text3);font-size:9px;margin-top:3px;letter-spacing:0.5px;text-transform:uppercase;}
+.sb-section{padding:16px 12px 6px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.sb-item{padding:9px 14px;font-size:12px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:9px;border-left:3px solid transparent;transition:background 0.15s,color 0.15s;user-select:none;}
+.sb-item:hover{color:var(--text);background:var(--bg3);}
+.sb-item.active{color:var(--orange);background:var(--orange-bg);border-left-color:var(--orange);}
+.sb-icon{font-size:13px;width:15px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--red-bg);color:var(--red);font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;}
+.sb-footer{margin-top:auto;padding:14px;border-top:1px solid var(--border);}
+.sb-user{font-size:10px;color:var(--text3);}
+.sb-user strong{color:var(--text2);display:block;margin-bottom:2px;}
+
+/* ── TOPBAR ──────────────────────────────────────────────────── */
+.topbar-info .title{color:var(--text);font-size:15px;font-weight:700;}
+.topbar-info .sub{color:var(--text3);font-size:10px;margin-top:2px;}
+.topbar-actions{display:flex;gap:8px;}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn-pri{background:var(--orange);color:#fff;border:none;padding:8px 16px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;}
+.btn-pri:hover{background:var(--orange-dim);}
+.btn-pri:disabled{background:#444;cursor:not-allowed;}
+.btn-sec{background:transparent;color:var(--text2);border:1px solid var(--border2);padding:8px 16px;border-radius:5px;font-size:12px;cursor:pointer;transition:all 0.15s;}
+.btn-sec:hover{border-color:var(--orange);color:var(--orange);}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,113,113,0.3);padding:8px 16px;border-radius:5px;font-size:12px;cursor:pointer;transition:all 0.15s;}
+.btn-danger:hover{background:rgba(248,113,113,0.2);}
+.btn-sm{padding:4px 10px;font-size:10px;}
+
+/* ── VIEWS ───────────────────────────────────────────────────── */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── KPI STRIP ───────────────────────────────────────────────── */
+.kpi-strip{display:grid;gap:12px;margin-bottom:18px;}
+.kpi-4{grid-template-columns:repeat(4,1fr);}
+.kpi-3{grid-template-columns:repeat(3,1fr);}
+.kpi{background:var(--bg3);border-radius:8px;padding:13px 15px;border:1px solid var(--border);border-top:3px solid var(--orange);}
+.kpi-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.kpi-val{font-size:22px;font-weight:700;color:var(--text);line-height:1;}
+.kpi-val.red{color:var(--red);}
+.kpi-val.orange{color:var(--orange);}
+.kpi-val.green{color:var(--green);}
+.kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;}
+
+/* ── TABLES ──────────────────────────────────────────────────── */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.section-title{font-size:10px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.search-box{background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:6px 12px;font-size:11px;color:var(--text2);width:180px;outline:none;transition:border-color 0.15s;}
+.search-box:focus{border-color:var(--orange);}
+.tbl-wrap{overflow-x:auto;margin-bottom:20px;}
+.tbl{width:100%;border-collapse:collapse;min-width:500px;}
+.tbl th{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;background:var(--bg);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.tbl td{font-size:12px;color:var(--text2);padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr.clickable:hover td{background:var(--bg3);cursor:pointer;}
+.tbl td.name{color:var(--text);font-weight:600;}
+.empty-state{text-align:center;padding:32px;color:var(--text3);font-size:12px;}
+
+/* ── BADGES ──────────────────────────────────────────────────── */
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:9px;font-weight:700;white-space:nowrap;}
+.badge.pend{background:var(--yellow-bg);color:var(--yellow);}
+.badge.venc{background:var(--red-bg);color:var(--red);}
+.badge.cob{background:var(--green-bg);color:var(--green);}
+.badge.act{background:var(--orange-bg);color:var(--orange);}
+.action-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.action-btn:hover{border-color:var(--orange);color:var(--orange);}
+
+/* ── DETAIL PANEL ────────────────────────────────────────────── */
+.detail-panel{position:absolute;top:0;right:0;width:320px;height:100%;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:20;transform:translateX(100%);transition:transform 0.22s ease;}
+.detail-panel.open{transform:translateX(0);}
+.detail-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0;}
+.detail-name{color:var(--text);font-size:14px;font-weight:700;}
+.detail-meta{color:var(--text3);font-size:10px;margin-top:3px;line-height:1.5;}
+.detail-close{color:var(--text3);background:none;border:none;font-size:18px;cursor:pointer;line-height:1;padding:2px 4px;transition:color 0.15s;}
+.detail-close:hover{color:var(--red);}
+.detail-body{flex:1;overflow-y:auto;padding:14px 16px;}
+.detail-kpis{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+.dkpi{background:var(--bg3);border-radius:6px;padding:10px 12px;border:1px solid var(--border);}
+.dkpi-label{font-size:9px;color:var(--text3);text-transform:uppercase;margin-bottom:3px;}
+.dkpi-val{font-size:15px;font-weight:700;color:var(--text);}
+.det-sec-title{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.timeline{border-left:2px solid var(--border2);padding-left:15px;margin-left:4px;}
+.tl-item{position:relative;margin-bottom:13px;}
+.tl-dot{position:absolute;left:-20px;top:4px;width:8px;height:8px;border-radius:50%;}
+.tl-dot.done{background:var(--green);}
+.tl-dot.due{background:var(--orange);}
+.tl-dot.late{background:var(--red);}
+.tl-dot.future{background:var(--border2);}
+.tl-date{font-size:9px;color:var(--text3);}
+.tl-desc{font-size:11px;color:var(--text2);font-weight:600;margin-top:1px;}
+.tl-amount{font-size:11px;color:var(--text);margin-top:1px;}
+.detail-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;}
+.detail-footer .btn-pri,.detail-footer .btn-danger{flex:1;text-align:center;}
+
+/* ── FORM ────────────────────────────────────────────────────── */
+.form-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:14px;}
+.form-card-title{color:var(--orange);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;}
+.tipo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.tipo-opt{padding:12px;border:1px solid var(--border2);border-radius:7px;cursor:pointer;transition:all 0.15s;user-select:none;}
+.tipo-opt:hover{border-color:var(--text3);}
+.tipo-opt.selected{border-color:var(--orange);background:var(--orange-bg);}
+.tipo-opt-icon{font-size:16px;margin-bottom:4px;}
+.tipo-opt-label{font-size:12px;font-weight:700;color:var(--text2);}
+.tipo-opt-sub{font-size:10px;color:var(--text3);margin-top:2px;}
+.tipo-opt.selected .tipo-opt-label{color:var(--orange);}
+.form-grid-1{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-grid-2:last-child,.form-grid-3:last-child,.form-grid-1:last-child{margin-bottom:0;}
+.field label{display:block;font-size:9px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px;}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:8px 11px;font-size:12px;color:var(--text2);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);color:var(--text);}
+.field input.error,.field select.error{border-color:var(--red)!important;}
+.field select option{background:var(--bg2);color:var(--text2);}
+.field-note{font-size:9px;color:var(--text3);margin-top:4px;}
+.form-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:4px;}
+.form-alert{border-radius:7px;padding:12px 16px;font-size:12px;font-weight:700;margin-bottom:14px;display:none;}
+.form-alert.show{display:block;}
+.form-alert.success{background:var(--green-bg);border:1px solid rgba(74,222,128,0.3);color:var(--green);}
+.form-alert.error{background:var(--red-bg);border:1px solid rgba(248,113,113,0.3);color:var(--red);}
+
+/* ── VENC ITEMS ──────────────────────────────────────────────── */
+.venc-item{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:7px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.venc-item.late{border-left-color:var(--red);}
+.venc-item.due{border-left-color:var(--orange);}
+.venc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.venc-info{flex:1;min-width:0;}
+.venc-cliente{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.venc-concepto{font-size:10px;color:var(--text3);margin-top:2px;}
+.venc-right{text-align:right;flex-shrink:0;}
+.venc-date{font-size:10px;color:var(--text2);}
+.venc-amount{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
+
+/* ── MODAL ───────────────────────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:none;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:24px;width:340px;max-width:92vw;}
+.modal-title{color:var(--text);font-size:15px;font-weight:700;margin-bottom:6px;}
+.modal-sub{color:var(--text3);font-size:11px;margin-bottom:8px;line-height:1.5;}
+.modal-amount{color:var(--orange);font-size:22px;font-weight:700;margin-bottom:18px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:5px;}
+.modal-field input,.modal-field select{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:5px;padding:9px 12px;font-size:12px;color:var(--text2);outline:none;transition:border-color 0.15s;}
+.modal-field input:focus,.modal-field select:focus{border-color:var(--orange);}
+.modal-field select option{background:var(--bg2);}
+.modal-footer{display:flex;gap:8px;margin-top:6px;}
+.modal-footer button{flex:1;padding:10px;}
+
+/* ── SPINNER ─────────────────────────────────────────────────── */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .kpi-4{grid-template-columns:repeat(2,1fr);}
+  .form-grid-3{grid-template-columns:1fr 1fr;}
+  .tipo-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+  <nav class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">SEALCODE</div>
+      <div class="sb-logo-sub">Gestión de Cobranzas</div>
+    </div>
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" data-view="dashboard" onclick="switchView('dashboard',this)">
+      <span class="sb-icon">◈</span>Dashboard
+    </div>
+    <div class="sb-item" data-view="acuerdos" onclick="switchView('acuerdos',this)">
+      <span class="sb-icon">≡</span>Acuerdos activos
+    </div>
+    <div class="sb-section">Acciones</div>
+    <div class="sb-item" data-view="nuevo" onclick="switchView('nuevo',this)">
+      <span class="sb-icon">＋</span>Nuevo acuerdo
+    </div>
+    <div class="sb-item" data-view="cobrar" onclick="switchView('cobrar',this)">
+      <span class="sb-icon">✓</span>Marcar cobrado
+      <span class="sb-badge" id="sb-venc-count">—</span>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <strong>Solo administración</strong>
+        Lucas · Pablo · Carlos · Hernán
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ═════════════════════════════════════════════════ -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-info">
+        <div class="title" id="topbar-title">Dashboard</div>
+        <div class="sub" id="topbar-sub">Resumen de cobranzas</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-sec" onclick="switchView('cobrar')">Marcar cobrado</button>
+        <button class="btn-pri" onclick="switchView('nuevo')">+ Nuevo acuerdo</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content" id="main-content">
+
+      <!-- ── DASHBOARD ─────────────────────────────────────── -->
+      <div class="view active" id="view-dashboard">
+        <div class="kpi-strip kpi-4" id="kpi-dashboard">
+          <div class="kpi"><div class="kpi-label">Pendiente ARS</div><div class="kpi-val orange" id="kpi-pend-ars">—</div><div class="kpi-sub" id="kpi-pend-ars-sub">cargando...</div></div>
+          <div class="kpi"><div class="kpi-label">Pendiente USD</div><div class="kpi-val" id="kpi-pend-usd">—</div><div class="kpi-sub" id="kpi-pend-usd-sub">cargando...</div></div>
+          <div class="kpi"><div class="kpi-label">Vencidos</div><div class="kpi-val red" id="kpi-vencidos">—</div><div class="kpi-sub" id="kpi-vencidos-sub">cargando...</div></div>
+          <div class="kpi"><div class="kpi-label">Vence esta semana</div><div class="kpi-val orange" id="kpi-semana">—</div><div class="kpi-sub" id="kpi-semana-sub">cargando...</div></div>
+        </div>
+        <div class="section-hdr"><div class="section-title">Próximos vencimientos — 7 días</div></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Concepto</th><th>Vence</th><th>Monto</th><th>Moneda</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="tbody-proximos"><tr><td colspan="7" class="empty-state">Cargando datos...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="section-hdr"><div class="section-title">Vencidos sin cobrar</div></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Concepto</th><th>Venció</th><th>Monto</th><th>Moneda</th><th>Días</th><th></th></tr></thead>
+            <tbody id="tbody-vencidos"><tr><td colspan="7" class="empty-state">Cargando datos...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── ACUERDOS ACTIVOS ──────────────────────────────── -->
+      <div class="view" id="view-acuerdos">
+        <div class="kpi-strip kpi-4">
+          <div class="kpi"><div class="kpi-label">Total acuerdos</div><div class="kpi-val" id="kpi-total-ac">—</div><div class="kpi-sub">activos</div></div>
+          <div class="kpi"><div class="kpi-label">Recurrentes</div><div class="kpi-val orange" id="kpi-recurrentes">—</div><div class="kpi-sub">contratos mensuales</div></div>
+          <div class="kpi"><div class="kpi-label">En cuotas</div><div class="kpi-val" id="kpi-cuotas-ac">—</div><div class="kpi-sub">planes de pago</div></div>
+          <div class="kpi"><div class="kpi-label">Pago único</div><div class="kpi-val" id="kpi-unicos-ac">—</div><div class="kpi-sub">con fecha</div></div>
+        </div>
+        <div class="section-hdr">
+          <div class="section-title">Todos los acuerdos</div>
+          <input class="search-box" id="search-acuerdos" placeholder="Buscar cliente..." oninput="filtrarAcuerdos(this.value)" autocomplete="off"/>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Cliente</th><th>Concepto</th><th>Tipo</th><th>Monto total</th><th>Moneda</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="tbody-acuerdos"><tr><td colspan="7" class="empty-state">Cargando datos...</td></tr></tbody>
+          </table>
+        </div>
+        <div id="empty-acuerdos" class="empty-state" style="display:none;">Sin resultados para esa búsqueda.</div>
+      </div>
+
+      <!-- ── NUEVO ACUERDO ─────────────────────────────────── -->
+      <div class="view" id="view-nuevo">
+        <div class="form-alert success" id="alert-success">✓ Acuerdo guardado correctamente. Podés verlo en Acuerdos activos.</div>
+        <div class="form-alert error" id="alert-error">✗ Hubo un error al guardar. Revisá tu conexión e intentá de nuevo.</div>
+
+        <!-- TIPO -->
+        <div class="form-card">
+          <div class="form-card-title">1 — Tipo de acuerdo</div>
+          <div class="tipo-grid">
+            <div class="tipo-opt selected" data-tipo="recurrente" onclick="selectTipo(this)">
+              <div class="tipo-opt-icon">↻</div>
+              <div class="tipo-opt-label">Contrato recurrente</div>
+              <div class="tipo-opt-sub">Cobro mensual sin fecha de fin</div>
+            </div>
+            <div class="tipo-opt" data-tipo="cuotas" onclick="selectTipo(this)">
+              <div class="tipo-opt-icon">◫</div>
+              <div class="tipo-opt-label">Cuotas</div>
+              <div class="tipo-opt-sub">Fraccionado en N pagos</div>
+            </div>
+            <div class="tipo-opt" data-tipo="unico" onclick="selectTipo(this)">
+              <div class="tipo-opt-icon">◷</div>
+              <div class="tipo-opt-label">Pago único con fecha</div>
+              <div class="tipo-opt-sub">Un solo pago en fecha futura</div>
+            </div>
+            <div class="tipo-opt" data-tipo="momento" onclick="selectTipo(this)">
+              <div class="tipo-opt-icon">⚡</div>
+              <div class="tipo-opt-label">Cobrado en el momento</div>
+              <div class="tipo-opt-sub">Pago ya recibido ahora</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DATOS BASE -->
+        <div class="form-card">
+          <div class="form-card-title">2 — Datos del acuerdo</div>
+          <div class="form-grid-2">
+            <div class="field"><label>Cliente *</label><input id="f-cliente" type="text" placeholder="Nombre o razón social" autocomplete="off"/></div>
+            <div class="field"><label>Concepto *</label><input id="f-concepto" type="text" placeholder="Ej: Canon comodato junio" autocomplete="off"/></div>
+          </div>
+          <div class="form-grid-3">
+            <div class="field"><label>Monto total *</label><input id="f-monto" type="number" placeholder="0.00" min="0" step="0.01"/></div>
+            <div class="field"><label>Moneda</label>
+              <select id="f-moneda">
+                <option value="ARS">ARS — Pesos</option>
+                <option value="USD">USD — Dólares</option>
+              </select>
+            </div>
+            <div class="field" id="f-dia-wrap">
+              <label>Día de cobro habitual</label>
+              <input id="f-dia" type="number" placeholder="Ej: 10" min="1" max="31"/>
+              <div class="field-note">Día del mes en que vence</div>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="field"><label>Mail del cliente</label><input id="f-mail" type="email" placeholder="cliente@empresa.com" autocomplete="off"/></div>
+            <div class="field"><label>Notas internas</label><input id="f-notas" type="text" placeholder="Observaciones opcionales" autocomplete="off"/></div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DINÁMICA: RECURRENTE -->
+        <div class="form-card" id="sec-recurrente">
+          <div class="form-card-title">3 — Configuración del contrato</div>
+          <div class="form-grid-2">
+            <div class="field"><label>Monto mensual *</label><input id="f-monto-mensual" type="number" placeholder="0.00" min="0" step="0.01"/></div>
+            <div class="field"><label>Primer vencimiento *</label><input id="f-fecha-rec" type="date"/>
+              <div class="field-note">Fecha del primer cobro mensual</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DINÁMICA: CUOTAS -->
+        <div class="form-card" id="sec-cuotas" style="display:none;">
+          <div class="form-card-title">3 — Configuración de cuotas</div>
+          <div class="form-grid-3">
+            <div class="field"><label>Cantidad de cuotas *</label><input id="f-ncuotas" type="number" placeholder="Ej: 3" min="2" max="60"/></div>
+            <div class="field"><label>Monto por cuota *</label><input id="f-monto-cuota" type="number" placeholder="0.00" min="0" step="0.01"/></div>
+            <div class="field"><label>Primer vencimiento *</label><input id="f-fecha-cuota" type="date"/>
+              <div class="field-note">Las siguientes se calculan +30 días</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DINÁMICA: PAGO ÚNICO -->
+        <div class="form-card" id="sec-unico" style="display:none;">
+          <div class="form-card-title">3 — Fecha de vencimiento</div>
+          <div class="form-grid-2">
+            <div class="field"><label>Fecha de pago acordada *</label><input id="f-fecha-unico" type="date"/>
+              <div class="field-note">Fecha en que el cliente debe pagar</div>
+            </div>
+            <div class="field"><label>Forma de pago esperada</label>
+              <select id="f-forma-unico">
+                <option value="Transferencia">Transferencia</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="A confirmar">A confirmar</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DINÁMICA: COBRADO EN EL MOMENTO -->
+        <div class="form-card" id="sec-momento" style="display:none;">
+          <div class="form-card-title">3 — Detalles del cobro recibido</div>
+          <div class="form-grid-3">
+            <div class="field"><label>Fecha de cobro *</label><input id="f-fecha-momento" type="date"/></div>
+            <div class="field"><label>Forma de pago</label>
+              <select id="f-forma-momento">
+                <option value="Transferencia">Transferencia</option>
+                <option value="Efectivo">Efectivo</option>
+              </select>
+            </div>
+            <div class="field"><label>Quién cobró</label>
+              <select id="f-quien">
+                <option value="Lucas">Lucas</option>
+                <option value="Pablo">Pablo</option>
+                <option value="Carlos">Carlos</option>
+                <option value="Hernán">Hernán</option>
+                <option value="Técnico">Técnico en campo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-sec" onclick="resetForm()">Limpiar campos</button>
+          <button class="btn-pri" id="btn-guardar" onclick="guardarAcuerdo()">Guardar acuerdo</button>
+        </div>
+      </div>
+
+      <!-- ── MARCAR COBRADO ────────────────────────────────── -->
+      <div class="view" id="view-cobrar">
+        <div class="kpi-strip kpi-3">
+          <div class="kpi"><div class="kpi-label">Vencidos hoy o antes</div><div class="kpi-val red" id="kpi-venc-cobrar">—</div><div class="kpi-sub">requieren atención</div></div>
+          <div class="kpi"><div class="kpi-label">Vencen esta semana</div><div class="kpi-val orange" id="kpi-semana-cobrar">—</div><div class="kpi-sub">recordatorio activo</div></div>
+          <div class="kpi"><div class="kpi-label">Cobrados este mes</div><div class="kpi-val green" id="kpi-cobrados-mes">—</div><div class="kpi-sub" id="kpi-cobrados-mes-sub">—</div></div>
+        </div>
+        <div class="section-hdr"><div class="section-title">Pendientes — ordenados por urgencia</div></div>
+        <div id="lista-cobrar"><div class="empty-state">Cargando datos...</div></div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-hdr">
+        <div>
+          <div class="detail-name" id="dp-name">—</div>
+          <div class="detail-meta" id="dp-meta">—</div>
+        </div>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-kpis">
+          <div class="dkpi"><div class="dkpi-label">Monto total</div><div class="dkpi-val" id="dp-total">—</div></div>
+          <div class="dkpi"><div class="dkpi-label">Estado</div><div class="dkpi-val" id="dp-estado">—</div></div>
+          <div class="dkpi"><div class="dkpi-label">Cuotas cobradas</div><div class="dkpi-val" id="dp-cobradas">—</div></div>
+          <div class="dkpi"><div class="dkpi-label">Pendiente</div><div class="dkpi-val" id="dp-pend" style="color:var(--orange);">—</div></div>
+        </div>
+        <div class="det-sec-title">Línea de tiempo</div>
+        <div class="timeline" id="dp-timeline"></div>
+      </div>
+      <div class="detail-footer">
+        <button class="btn-pri" id="dp-cobrar-btn">Marcar cobrado</button>
+        <button class="btn-danger" onclick="openModalCancelar()">Cancelar acuerdo</button>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ MODAL: COBRAR ═════════════════════════════════════════════ -->
+<div class="modal-bg" id="modal-cobrar">
+  <div class="modal-box">
+    <div class="modal-title">Registrar cobro</div>
+    <div class="modal-sub" id="mc-concepto">—</div>
+    <div class="modal-amount" id="mc-monto">—</div>
+    <div class="modal-field">
+      <label>Fecha de cobro *</label>
+      <input type="date" id="mc-fecha"/>
+    </div>
+    <div class="modal-field">
+      <label>Forma de pago</label>
+      <select id="mc-forma">
+        <option value="Transferencia">Transferencia</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Cheque">Cheque</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Quién registra el cobro</label>
+      <select id="mc-quien">
+        <option value="Lucas">Lucas</option>
+        <option value="Pablo">Pablo</option>
+        <option value="Carlos">Carlos</option>
+        <option value="Hernán">Hernán</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sec" onclick="closeModal('modal-cobrar')">Cancelar</button>
+      <button class="btn-pri" id="btn-confirmar-cobro" onclick="confirmarCobro()">Confirmar cobro</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CANCELAR ACUERDO ══════════════════════════════════ -->
+<div class="modal-bg" id="modal-cancelar">
+  <div class="modal-box">
+    <div class="modal-title" style="color:var(--red);">Cancelar acuerdo</div>
+    <div class="modal-sub">¿Estás seguro? Esta acción marca el acuerdo como cancelado. Las cuotas pendientes quedarán sin efecto.<br><br><strong id="modal-cancelar-nombre" style="color:var(--text);">—</strong></div>
+    <div class="modal-footer" style="margin-top:20px;">
+      <button class="btn-sec" onclick="closeModal('modal-cancelar')">Volver</button>
+      <button class="btn-danger" id="btn-confirmar-cancelar" onclick="confirmarCancelar()">Sí, cancelar acuerdo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN — reemplazar con URL real del webhook Make
+// ════════════════════════════════════════════════════════════════
+var WEBHOOK_NUEVO_ACUERDO = "WEBHOOK_URL_AQUI";
+var WEBHOOK_MARCAR_COBRADO = "WEBHOOK_URL_AQUI";
+var WEBHOOK_CANCELAR = "WEBHOOK_URL_AQUI";
+
+// ════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════
+var STATE = {
+  acuerdos: [],
+  vencimientos: [],
+  cargado: false,
+  detailKey: null,
+  cobraData: null   // datos del cobro pendiente de confirmar
+};
+
+// ════════════════════════════════════════════════════════════════
+// MOCK DATA — se reemplaza por GET al Sheets cuando haya webhook
+// ════════════════════════════════════════════════════════════════
+var MOCK_ACUERDOS = [
+  {id:'AC001',cliente:'Arcor S.A.',concepto:'Canon comodato',tipo:'Recurrente',monto:'135000',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'10/04/2026',monto:'$45.000',estado:'done'},{n:2,fecha:'10/05/2026',monto:'$45.000',estado:'done'},{n:3,fecha:'10/06/2026',monto:'$45.000',estado:'due'}]},
+  {id:'AC002',cliente:'Bimbo Argentina',concepto:'Reparación TIJ',tipo:'Cuotas',monto:'96000',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'10/04/2026',monto:'$32.000',estado:'done'},{n:2,fecha:'08/06/2026',monto:'$32.000',estado:'late'},{n:3,fecha:'08/07/2026',monto:'$32.000',estado:'future'}]},
+  {id:'AC003',cliente:'Molinos Río',concepto:'Preventivo junio',tipo:'Pago único',monto:'18500',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'12/06/2026',monto:'$18.500',estado:'due'}]},
+  {id:'AC004',cliente:'La Serenísima',concepto:'Canon comodato HD',tipo:'Cuotas',monto:'110000',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'14/06/2026',monto:'$55.000',estado:'due'},{n:2,fecha:'14/07/2026',monto:'$55.000',estado:'future'}]},
+  {id:'AC005',cliente:'Danone Argentina',concepto:'Insumos DOD',tipo:'Recurrente',monto:'28000',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'15/06/2026',monto:'$28.000',estado:'due'}]},
+  {id:'AC006',cliente:'Pepsico Argentina',concepto:'Insumos laser',tipo:'Pago único',monto:'21000',moneda:'ARS',estado:'Vencido',
+   cuotas:[{n:1,fecha:'28/05/2026',monto:'$21.000',estado:'late'}]},
+  {id:'AC007',cliente:'Unilever',concepto:'Canon comodato',tipo:'Cuotas',monto:'56000',moneda:'ARS',estado:'Activo',
+   cuotas:[{n:1,fecha:'15/03/2026',monto:'$14.000',estado:'done'},{n:2,fecha:'15/05/2026',monto:'$14.000',estado:'late'},{n:3,fecha:'15/06/2026',monto:'$14.000',estado:'future'},{n:4,fecha:'15/07/2026',monto:'$14.000',estado:'future'}]},
+  {id:'AC008',cliente:'Kraft Heinz',concepto:'Mantenimiento anual',tipo:'Recurrente',monto:'1200',moneda:'USD',estado:'Activo',
+   cuotas:[{n:1,fecha:'01/01/2026',monto:'$100 USD',estado:'done'},{n:2,fecha:'01/02/2026',monto:'$100 USD',estado:'done'},{n:3,fecha:'01/06/2026',monto:'$100 USD',estado:'due'}]}
+];
+
+// ════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function(){
+  STATE.acuerdos = MOCK_ACUERDOS;
+  renderDashboard();
+  renderAcuerdos();
+  renderCobrar();
+  actualizarFormulario();
+  setTodayDates();
+});
+
+function setTodayDates(){
+  var today = new Date().toISOString().split('T')[0];
+  var campos = ['f-fecha-rec','f-fecha-cuota','f-fecha-unico','f-fecha-momento','mc-fecha'];
+  campos.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && !el.value) el.value = today;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDER DASHBOARD
+// ════════════════════════════════════════════════════════════════
+function renderDashboard(){
+  var ac = STATE.acuerdos;
+  var pendARS = 0, pendUSD = 0, vencidos = 0, semana = 0;
+  var proximos = [], vencList = [];
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var en7 = new Date(hoy); en7.setDate(hoy.getDate()+7);
+
+  ac.forEach(function(a){
+    a.cuotas.forEach(function(c){
+      if(c.estado === 'done') return;
+      var fParts = c.fecha.split('/');
+      var fDate = new Date(fParts[2], fParts[1]-1, fParts[0]);
+      var monto = parseFloat(a.monto / a.cuotas.length);
+      if(c.estado === 'late'){
+        vencidos++;
+        vencList.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,dias:Math.floor((hoy-fDate)/(1000*60*60*24)),id:a.id,cuotaN:c.n});
+        if(a.moneda==='ARS') pendARS += monto;
+        else pendUSD += monto;
+      }
+      if(c.estado === 'due'){
+        if(fDate >= hoy && fDate <= en7) semana++;
+        proximos.push({cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,fecha:c.fecha,monto:formatMonto(c.monto),moneda:a.moneda,estado:c.estado,id:a.id,cuotaN:c.n});
+        if(a.moneda==='ARS') pendARS += monto;
+        else pendUSD += monto;
+      }
+    });
+  });
+
+  setText('kpi-pend-ars', '$'+pendARS.toLocaleString('es-AR',{minimumFractionDigits:0}));
+  setText('kpi-pend-ars-sub', ac.filter(function(a){return a.moneda==='ARS'&&a.estado==='Activo';}).length+' acuerdos activos');
+  setText('kpi-pend-usd', '$'+pendUSD.toLocaleString('es-US',{minimumFractionDigits:0}));
+  setText('kpi-pend-usd-sub', ac.filter(function(a){return a.moneda==='USD';}).length+' acuerdos activos');
+  setText('kpi-vencidos', String(vencidos));
+  setText('kpi-semana', String(semana));
+  setText('sb-venc-count', String(vencidos));
+  setText('kpi-venc-cobrar', String(vencidos));
+  setText('kpi-semana-cobrar', String(semana));
+
+  // tabla proximos
+  var tPrx = document.getElementById('tbody-proximos');
+  if(proximos.length === 0){
+    tPrx.innerHTML = '<tr><td colspan="7" class="empty-state">Sin vencimientos en los próximos 7 días.</td></tr>';
+  } else {
+    tPrx.innerHTML = proximos.map(function(r){
+      return '<tr class="clickable" onclick="openDetail(\''+r.id+'\')">'
+        +'<td class="name">'+r.cliente+'</td><td>'+r.concepto+'</td><td>'+r.fecha+'</td>'
+        +'<td>'+r.monto+'</td><td>'+r.moneda+'</td>'
+        +'<td><span class="badge pend">Pendiente</span></td>'
+        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button></td>'
+        +'</tr>';
+    }).join('');
+  }
+
+  // tabla vencidos
+  var tVenc = document.getElementById('tbody-vencidos');
+  if(vencList.length === 0){
+    tVenc.innerHTML = '<tr><td colspan="7" class="empty-state">Sin cuotas vencidas. ✓</td></tr>';
+  } else {
+    tVenc.innerHTML = vencList.map(function(r){
+      return '<tr class="clickable" onclick="openDetail(\''+r.id+'\')">'
+        +'<td class="name">'+r.cliente+'</td><td>'+r.concepto+'</td><td>'+r.fecha+'</td>'
+        +'<td>'+r.monto+'</td><td>'+r.moneda+'</td>'
+        +'<td style="color:var(--red);font-weight:700;">'+r.dias+'</td>'
+        +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button></td>'
+        +'</tr>';
+    }).join('');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDER ACUERDOS
+// ════════════════════════════════════════════════════════════════
+function renderAcuerdos(filtro){
+  var ac = STATE.acuerdos;
+  var activos = ac.filter(function(a){return a.estado==='Activo';}).length;
+  var recurrentes = ac.filter(function(a){return a.tipo==='Recurrente';}).length;
+  var cuotas = ac.filter(function(a){return a.tipo==='Cuotas';}).length;
+  var unicos = ac.filter(function(a){return a.tipo==='Pago único';}).length;
+
+  setText('kpi-total-ac', String(activos));
+  setText('kpi-recurrentes', String(recurrentes));
+  setText('kpi-cuotas-ac', String(cuotas));
+  setText('kpi-unicos-ac', String(unicos));
+
+  var lista = filtro ? ac.filter(function(a){return a.cliente.toLowerCase().indexOf(filtro.toLowerCase())>-1;}) : ac;
+  var tbody = document.getElementById('tbody-acuerdos');
+  var empty = document.getElementById('empty-acuerdos');
+
+  if(lista.length === 0){
+    tbody.innerHTML = '';
+    if(empty) empty.style.display='block';
+    return;
+  }
+  if(empty) empty.style.display='none';
+
+  tbody.innerHTML = lista.map(function(a){
+    var badge = a.estado==='Activo'?'act':(a.estado==='Vencido'?'venc':'cob');
+    return '<tr class="clickable" onclick="openDetail(\''+a.id+'\')">'
+      +'<td class="name">'+a.cliente+'</td>'
+      +'<td>'+a.concepto+'</td>'
+      +'<td>'+a.tipo+'</td>'
+      +'<td>'+formatMonto('$'+Number(a.monto).toLocaleString('es-AR'))+'</td>'
+      +'<td>'+a.moneda+'</td>'
+      +'<td><span class="badge '+badge+'">'+a.estado+'</span></td>'
+      +'<td><button class="action-btn btn-sm" onclick="event.stopPropagation();openDetail(\''+a.id+'\')">Ver</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+function filtrarAcuerdos(q){
+  renderAcuerdos(q);
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDER MARCAR COBRADO
+// ════════════════════════════════════════════════════════════════
+function renderCobrar(){
+  var hoy = new Date(); hoy.setHours(0,0,0,0);
+  var items = [];
+
+  STATE.acuerdos.forEach(function(a){
+    a.cuotas.forEach(function(c){
+      if(c.estado !== 'due' && c.estado !== 'late') return;
+      var fParts = c.fecha.split('/');
+      var fDate = new Date(fParts[2],fParts[1]-1,fParts[0]);
+      var dias = Math.floor((hoy-fDate)/(1000*60*60*24));
+      items.push({
+        cliente:a.cliente,concepto:a.concepto+' — C'+c.n+'/'+a.cuotas.length,
+        fecha:c.fecha,monto:c.monto,moneda:a.moneda,
+        late:c.estado==='late',dias:dias,id:a.id
+      });
+    });
+  });
+
+  // ordenar: vencidos primero, luego por fecha desc
+  items.sort(function(a,b){
+    if(a.late && !b.late) return -1;
+    if(!a.late && b.late) return 1;
+    return b.dias - a.dias;
+  });
+
+  var cobrados = STATE.acuerdos.reduce(function(n,a){
+    return n + a.cuotas.filter(function(c){return c.estado==='done';}).length;
+  },0);
+  setText('kpi-cobrados-mes', String(cobrados));
+  setText('kpi-cobrados-mes-sub', 'total registrados');
+
+  var lista = document.getElementById('lista-cobrar');
+  if(items.length === 0){
+    lista.innerHTML = '<div class="empty-state" style="padding:40px;">✓ Sin pendientes. Todo al día.</div>';
+    return;
+  }
+
+  lista.innerHTML = items.map(function(r){
+    var cls = r.late ? 'late' : 'due';
+    var dotColor = r.late ? 'var(--red)' : 'var(--orange)';
+    var dateColor = r.late ? 'color:var(--red)' : 'color:var(--orange)';
+    var fechaTxt = r.late
+      ? 'Venció '+r.fecha+(r.dias>0?' · '+r.dias+' día'+(r.dias>1?'s':''):'')
+      : 'Vence '+r.fecha;
+    var btnClass = r.late ? 'btn-pri' : 'btn-sec';
+    return '<div class="venc-item '+cls+'">'
+      +'<div class="venc-dot" style="background:'+dotColor+';"></div>'
+      +'<div class="venc-info"><div class="venc-cliente">'+r.cliente+'</div><div class="venc-concepto">'+r.concepto+'</div></div>'
+      +'<div class="venc-right"><div class="venc-date" style="'+dateColor+'">'+fechaTxt+'</div><div class="venc-amount">'+r.monto+' '+r.moneda+'</div></div>'
+      +'<button class="'+btnClass+' btn-sm" style="margin-left:10px;white-space:nowrap;" onclick="openModalCobrar(\''+r.cliente+'\',\''+r.concepto+'\',\''+r.monto+' '+r.moneda+'\')">Cobrar</button>'
+      +'</div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════════
+// DETAIL PANEL
+// ════════════════════════════════════════════════════════════════
+function openDetail(id){
+  var a = STATE.acuerdos.find(function(x){return x.id===id;});
+  if(!a) return;
+  STATE.detailKey = id;
+
+  setText('dp-name', a.cliente);
+  setText('dp-meta', a.concepto+' · '+a.tipo+' · '+a.moneda);
+  setText('dp-total', '$'+Number(a.monto).toLocaleString('es-AR'));
+  setText('dp-estado', a.estado);
+
+  var cobradas = a.cuotas.filter(function(c){return c.estado==='done';}).length;
+  var pendientes = a.cuotas.filter(function(c){return c.estado!=='done';}).length;
+  var montoPend = a.cuotas.filter(function(c){return c.estado!=='done';}).length * (a.monto/a.cuotas.length);
+  setText('dp-cobradas', cobradas+' / '+a.cuotas.length);
+  setText('dp-pend', '$'+Math.round(montoPend).toLocaleString('es-AR'));
+
+  var dotLabels = {done:'Cobrado',due:'Pendiente',late:'Vencido',future:'Futuro'};
+  document.getElementById('dp-timeline').innerHTML = a.cuotas.map(function(c){
+    return '<div class="tl-item">'
+      +'<div class="tl-dot '+c.estado+'"></div>'
+      +'<div class="tl-date">'+c.fecha+'</div>'
+      +'<div class="tl-desc">Cuota '+c.n+'/'+a.cuotas.length+'</div>'
+      +'<div class="tl-amount">'+c.monto+' — '+(dotLabels[c.estado]||c.estado)+'</div>'
+      +'</div>';
+  }).join('');
+
+  // cuota pendiente más urgente para botón
+  var proxCuota = a.cuotas.find(function(c){return c.estado==='late'||c.estado==='due';});
+  var btnCobrar = document.getElementById('dp-cobrar-btn');
+  if(proxCuota){
+    btnCobrar.disabled = false;
+    btnCobrar.onclick = function(){
+      openModalCobrar(a.cliente, a.concepto+' C'+proxCuota.n+'/'+a.cuotas.length, proxCuota.monto+' '+a.moneda);
+    };
+  } else {
+    btnCobrar.disabled = true;
+    btnCobrar.textContent = 'Sin cuotas pendientes';
+  }
+
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('main-content').classList.add('locked');
+}
+
+function closeDetail(){
+  document.getElementById('detail-panel').classList.remove('open');
+  document.getElementById('main-content').classList.remove('locked');
+  STATE.detailKey = null;
+}
+
+// ════════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ════════════════════════════════════════════════════════════════
+var TITLES = {
+  dashboard:['Dashboard','Resumen de cobranzas'],
+  acuerdos:['Acuerdos activos','Todos los contratos y planes de pago en curso'],
+  nuevo:['Nuevo acuerdo','Registrá un cobro manual o contrato'],
+  cobrar:['Marcar cobrado','Cuotas pendientes ordenadas por urgencia']
+};
+
+function switchView(id, el){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  var target = document.getElementById('view-'+id);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active');});
+  var navEl = el || document.querySelector('[data-view="'+id+'"]');
+  if(navEl && navEl.classList) navEl.classList.add('active');
+  var t = TITLES[id]||[id,''];
+  setText('topbar-title', t[0]);
+  setText('topbar-sub', t[1]);
+  closeDetail();
+}
+
+// ════════════════════════════════════════════════════════════════
+// FORMULARIO NUEVO ACUERDO
+// ════════════════════════════════════════════════════════════════
+var tipoActual = 'recurrente';
+
+function selectTipo(el){
+  document.querySelectorAll('.tipo-opt').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');
+  tipoActual = el.getAttribute('data-tipo');
+  actualizarFormulario();
+}
+
+function actualizarFormulario(){
+  var secs = ['recurrente','cuotas','unico','momento'];
+  secs.forEach(function(t){
+    var s = document.getElementById('sec-'+t);
+    if(s) s.style.display = t===tipoActual ? 'block' : 'none';
+  });
+  var diaWrap = document.getElementById('f-dia-wrap');
+  if(diaWrap) diaWrap.style.display = tipoActual==='recurrente' ? 'block' : 'none';
+  setTodayDates();
+}
+
+function camposRequeridos(){
+  var base = [
+    {id:'f-cliente',label:'Cliente'},
+    {id:'f-concepto',label:'Concepto'},
+    {id:'f-monto',label:'Monto total'}
+  ];
+  var extra = {
+    recurrente:[{id:'f-monto-mensual',label:'Monto mensual'},{id:'f-fecha-rec',label:'Primer vencimiento'}],
+    cuotas:[{id:'f-ncuotas',label:'Cantidad de cuotas'},{id:'f-monto-cuota',label:'Monto por cuota'},{id:'f-fecha-cuota',label:'Primer vencimiento'}],
+    unico:[{id:'f-fecha-unico',label:'Fecha de pago'}],
+    momento:[{id:'f-fecha-momento',label:'Fecha de cobro'}]
+  };
+  return base.concat(extra[tipoActual]||[]);
+}
+
+function guardarAcuerdo(){
+  // limpiar errores
+  document.querySelectorAll('.field input.error, .field select.error').forEach(function(el){el.classList.remove('error');});
+  hideAlerts();
+
+  var campos = camposRequeridos();
+  var errores = [];
+  campos.forEach(function(c){
+    var el = document.getElementById(c.id);
+    if(el && !el.value.toString().trim()){
+      el.classList.add('error');
+      errores.push(c.label);
+    }
+  });
+
+  if(errores.length > 0){
+    showAlert('alert-error', '✗ Campos requeridos: '+errores.join(', ')+'.'); 
+    return;
+  }
+
+  // construir payload
+  var payload = {
+    tipo: tipoActual,
+    cliente: val('f-cliente'),
+    concepto: val('f-concepto'),
+    monto: val('f-monto'),
+    moneda: val('f-moneda'),
+    mail: val('f-mail'),
+    notas: val('f-notas'),
+    origen: 'cobranza.html',
+    timestamp: new Date().toISOString()
+  };
+
+  if(tipoActual==='recurrente'){
+    payload.montoMensual = val('f-monto-mensual');
+    payload.diaCobro = val('f-dia');
+    payload.primerVencimiento = val('f-fecha-rec');
+  } else if(tipoActual==='cuotas'){
+    payload.cantidadCuotas = val('f-ncuotas');
+    payload.montoCuota = val('f-monto-cuota');
+    payload.primerVencimiento = val('f-fecha-cuota');
+  } else if(tipoActual==='unico'){
+    payload.fechaVencimiento = val('f-fecha-unico');
+    payload.formaPago = val('f-forma-unico');
+  } else if(tipoActual==='momento'){
+    payload.fechaCobro = val('f-fecha-momento');
+    payload.formaPago = val('f-forma-momento');
+    payload.quienCobro = val('f-quien');
+  }
+
+  var btn = document.getElementById('btn-guardar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Guardando...';
+
+  fetch(WEBHOOK_NUEVO_ACUERDO, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    showAlert('alert-success', '✓ Acuerdo guardado correctamente. Podés verlo en Acuerdos activos.');
+    resetForm();
+  })
+  .catch(function(){
+    // webhook no configurado todavía — mostrar éxito de todos modos en modo demo
+    if(WEBHOOK_NUEVO_ACUERDO === 'WEBHOOK_URL_AQUI'){
+      showAlert('alert-success', '✓ [MODO DEMO] Acuerdo guardado. Conectá el webhook de Make para persistir los datos.');
+      resetForm();
+    } else {
+      showAlert('alert-error', '✗ Error al guardar. Revisá tu conexión e intentá de nuevo.');
+    }
+  })
+  .finally(function(){
+    btn.disabled = false;
+    btn.textContent = 'Guardar acuerdo';
+  });
+}
+
+function resetForm(){
+  var ids = ['f-cliente','f-concepto','f-monto','f-dia','f-mail','f-notas',
+             'f-monto-mensual','f-ncuotas','f-monto-cuota'];
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){el.value='';el.classList.remove('error');}
+  });
+  setTodayDates();
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL COBRAR
+// ════════════════════════════════════════════════════════════════
+function openModalCobrar(cliente, concepto, monto){
+  STATE.cobraData = {cliente:cliente,concepto:concepto,monto:monto};
+  setText('mc-concepto', cliente+' — '+concepto);
+  setText('mc-monto', monto);
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('mc-fecha').value = today;
+  document.getElementById('modal-cobrar').classList.add('open');
+}
+
+function confirmarCobro(){
+  var fecha = document.getElementById('mc-fecha').value;
+  if(!fecha){alert('Ingresá la fecha de cobro.');return;}
+
+  var payload = {
+    accion: 'marcar_cobrado',
+    cliente: STATE.cobraData ? STATE.cobraData.cliente : '',
+    concepto: STATE.cobraData ? STATE.cobraData.concepto : '',
+    monto: STATE.cobraData ? STATE.cobraData.monto : '',
+    fechaCobro: fecha,
+    formaPago: document.getElementById('mc-forma').value,
+    quienCobro: document.getElementById('mc-quien').value,
+    timestamp: new Date().toISOString()
+  };
+
+  var btn = document.getElementById('btn-confirmar-cobro');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Registrando...';
+
+  fetch(WEBHOOK_MARCAR_COBRADO, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  })
+  .then(function(r){if(!r.ok) throw new Error();})
+  .catch(function(){}) // modo demo: ignorar error si webhook no está listo
+  .finally(function(){
+    btn.disabled = false;
+    btn.textContent = 'Confirmar cobro';
+    closeModal('modal-cobrar');
+    STATE.cobraData = null;
+    setText('topbar-sub','✓ Cobro registrado correctamente');
+    setTimeout(function(){setText('topbar-sub', TITLES[document.querySelector('.sb-item.active').getAttribute('data-view')][1]);},3000);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODAL CANCELAR
+// ════════════════════════════════════════════════════════════════
+function openModalCancelar(){
+  var a = STATE.detailKey ? STATE.acuerdos.find(function(x){return x.id===STATE.detailKey;}) : null;
+  setText('modal-cancelar-nombre', a ? a.cliente+' — '+a.concepto : '—');
+  document.getElementById('modal-cancelar').classList.add('open');
+}
+
+function confirmarCancelar(){
+  var payload = {
+    accion: 'cancelar_acuerdo',
+    id: STATE.detailKey,
+    timestamp: new Date().toISOString()
+  };
+  fetch(WEBHOOK_CANCELAR,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(function(){});
+  closeModal('modal-cancelar');
+  closeDetail();
+}
+
+// ════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function setText(id,txt){var el=document.getElementById(id);if(el)el.textContent=txt;}
+function val(id){var el=document.getElementById(id);return el?el.value:'';}
+function formatMonto(s){return s;}
+function showAlert(id,msg){var el=document.getElementById(id);if(el){el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show');},6000);}}
+function hideAlerts(){['alert-success','alert-error'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('show');});}
+
+// cerrar modales con click fuera
+document.addEventListener('click',function(e){
+  ['modal-cobrar','modal-cancelar'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el && e.target===el) closeModal(id);
+  });
+});
+</script>
+</body>
+</html>
