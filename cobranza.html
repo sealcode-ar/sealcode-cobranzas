@@ -902,7 +902,8 @@ function guardarAcuerdo(){
     payload.montoCuota = val('f-monto-cuota');
     payload.primerVencimiento = val('f-fecha-cuota');
     var fechas = [];
-    var base = new Date(val('f-fecha-cuota'));
+    var partes = val('f-fecha-cuota').split('-');
+var base = new Date(parseInt(partes[0]), parseInt(partes[1])-1, parseInt(partes[2]));
     var n = parseInt(val('f-ncuotas'));
     for(var i = 0; i < n; i++){
       var f = new Date(base.getFullYear(), base.getMonth() + i, base.getDate());
