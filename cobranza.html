@@ -936,11 +936,15 @@ function guardarAcuerdo(){
       fechas.push(f.getFullYear() + '-' + String(f.getMonth()+1).padStart(2,'0') + '-' + String(f.getDate()).padStart(2,'0'));
     }
     payload.fechas = fechas;
-  } else if(tipoActual==='unico'){
+} else if(tipoActual==='unico'){
     payload.fechaVencimiento = val('f-fecha-unico');
     payload.formaPago = val('f-forma-unico');
-  } else if(tipoActual==='momento'){
+    payload.fechas = [val('f-fecha-unico')];
+    payload.cantidadCuotas = '1';
+ } else if(tipoActual==='momento'){
     payload.fechaCobro = val('f-fecha-momento');
+    payload.fechas = [val('f-fecha-momento')];
+    payload.cantidadCuotas = '1';
     payload.formaPago = val('f-forma-momento');
     payload.quienCobro = val('f-quien');
   }
